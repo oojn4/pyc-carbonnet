@@ -204,6 +204,7 @@ export const DrawingProvider: React.FC<DrawingProviderProps> = ({ children }) =>
     let area = 0;
     for (let i = 0; i < polygon.length; i++) {
       const j = (i + 1) % polygon.length;
+      console.log('Polygon:', polygon[j], polygon[i]);
       area += polygon[i][0] * polygon[j][1];
       area -= polygon[j][0] * polygon[i][1];
     }
@@ -276,8 +277,8 @@ export const DrawingProvider: React.FC<DrawingProviderProps> = ({ children }) =>
           totalCarbon2024 += feature.properties.total_carbon_2024_sum;
           
           // If feature has area info, add it to the total
-          if (feature.properties.Shape_Area && typeof feature.properties.Shape_Area === 'number') {
-            totalArea += feature.properties.Shape_Area;
+          if (feature.properties.area && typeof feature.properties.area === 'number') {
+            totalArea += feature.properties.area;
           }
           
           includedFeatures++;

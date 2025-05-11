@@ -20,7 +20,6 @@ import {
   CheckCircle,
   Download,
   FileCheck,
-  Upload,
   X
 } from "lucide-react";
 import React, { useState } from "react";
@@ -381,7 +380,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                     />
                   </div>
                   
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <div className="text-xs text-gray-500">Upload Supporting Document (Optional)</div>
                     <Button 
                       variant="outline" 
@@ -391,7 +390,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                       <Upload className="size-4" />
                       <span>Upload Document</span>
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
                 
                 <div className="flex items-center justify-center p-4">
