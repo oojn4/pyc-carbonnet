@@ -15,6 +15,8 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   BarChart2,
   CheckCircle,
@@ -22,7 +24,7 @@ import {
   FileCheck,
   X
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 interface ProjectData {
   name: string;
@@ -54,8 +56,12 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
     rsVerification: false
   });
 
+  // Ref for the PDF content
+  const pdfContentRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
   // Calculate carbon pricing
-  const carbonPricing = carbonMetrics?.marketableCredits ? carbonMetrics.marketableCredits * 96000 : 0;
+  const carbonPricing = carbonMetrics?.marketableCredits ? carbonMetrics.marketableCredits : 0;
 
   const handleProjectDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -90,6 +96,60 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
     setShowPdfPreview(false);
   };
 
+  // Function to download PDF
+  const handleDownloadPDF = async () => {
+    if (!pdfContentRef.current) return;
+    
+    try {
+      setDownloading(true);
+      
+      const content = pdfContentRef.current;
+      const canvas = await html2canvas(content, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff"
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      // Calculate dimensions
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let position = 0;
+      
+      // Add image to PDF
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      
+      // If content is taller than one page
+      let heightLeft = imgHeight;
+      const pageHeight = 295; // A4 height in mm
+      
+      while (heightLeft > pageHeight) {
+        position = heightLeft - pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      // Save the PDF
+      const fileName = `${projectData.name || 'Carbon_Project'}_Report_${new Date().toISOString().slice(0,10)}.pdf`;
+      pdf.save(fileName);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('There was an error generating the PDF. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   // PDF Report Preview Component
   const PdfPreview = () => {
     return (
@@ -102,7 +162,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
             </Button>
           </div>
           <div className="flex-1 overflow-auto p-6">
-            <div className="max-w-3xl mx-auto space-y-6">
+            <div ref={pdfContentRef} className="max-w-3xl mx-auto space-y-6">
               <div className="text-center">
                 <h1 className="text-2xl font-bold mb-2">Carbon Stock Comparative Analysis</h1>
                 <p className="text-sm text-gray-600">Report generated: {new Date().toLocaleDateString()}</p>
@@ -260,11 +320,11 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="font-bold text-green-800">Total Marketable Carbon Credits</h3>
+                      <h3 className="font-bold text-green-800">Total Net Sequestration</h3>
                       <p className="text-sm text-green-700">After accounting for leakage and permanence risks</p>
                     </div>
                     <div className="text-2xl font-bold text-green-700">
-                      {carbonMetrics?.marketableCredits || 0} tCO₂e
+                      {carbonMetrics?.netSequestration || 0} tCO₂e
                     </div>
                   </div>
                 </div>
@@ -288,8 +348,8 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                   </div>
                   <div className="mt-3 pt-3 border-t border-blue-200">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-blue-700">Marketable Credits</span>
-                      <span className="text-blue-700">{carbonMetrics?.marketableCredits || 0} tCO₂e</span>
+                      <span className="text-blue-700">Net Sequestration</span>
+                      <span className="text-blue-700">{carbonMetrics?.netSequestration || 0} tCO₂e</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-blue-700">Price per Credit</span>
@@ -303,7 +363,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <h2 className="text-xl font-semibold mb-4">Conclusion</h2>
                 <p>
                   The project demonstrates significant carbon sequestration potential with a net positive change in 
-                  carbon stocks between 2017 and 2024. The estimated {carbonMetrics?.marketableCredits || 0} tCO₂e 
+                  carbon stocks between 2017 and 2024. The estimated {carbonMetrics?.netSequestration || 0} tCO₂e 
                   of marketable carbon credits represent a valuable contribution to climate change mitigation efforts.
                 </p>
                 <p className="mt-2">
@@ -316,9 +376,22 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
             </div>
           </div>
           <div className="border-t p-4 flex justify-end">
-            <Button className="flex items-center gap-2">
-              <Download className="size-4" />
-              <span>Download PDF</span>
+            <Button 
+              className="flex items-center gap-2"
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+            >
+              {downloading ? (
+                <>
+                  <span className="animate-spin h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
+                  <span>Generating PDF...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="size-4" />
+                  <span>Download PDF</span>
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -425,7 +498,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <div className="space-y-2 rounded-md border p-2 bg-orange-50">
                   <div className="font-bold text-sm flex items-center gap-2">
                     <div className="flex items-center justify-center bg-orange-500 text-white rounded-full w-6 h-6 text-xs"></div>
-                    Automated Reporting System
+                    Automated Reporting System
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Generated based on your project data</span>
@@ -443,50 +516,6 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                     </TooltipProvider>
                   </div>
                 </div>
-{/*                 
-                <div className="space-y-2 rounded-md border p-2 bg-orange-50">
-                  <div className="font-bold text-sm flex items-center gap-2">
-                    <div className="flex items-center justify-center bg-orange-500 text-white rounded-full w-6 h-6 text-xs">2</div>
-                    Project Validation Report
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Initial validation of project eligibility</span>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-8" onClick={handleViewDocument}>
-                            <FileCheck className="size-4 mr-1" /> View
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>View document details</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 rounded-md border p-2 bg-orange-50">
-                  <div className="font-bold text-sm flex items-center gap-2">
-                    <div className="flex items-center justify-center bg-orange-500 text-white rounded-full w-6 h-6 text-xs">3</div>
-                    Carbon Credit Potential Assessment
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Carbon capture and financial valuation</span>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-8" onClick={handleViewDocument}>
-                            <FileCheck className="size-4 mr-1" /> View
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>View document details</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </div> */}
                 
                 <TooltipProvider>
                   <Tooltip>

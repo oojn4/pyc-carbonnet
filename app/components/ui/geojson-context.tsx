@@ -31,7 +31,7 @@ const initialLayers: GeoJSONLayerInfo[] = [
   { id: "leakage", name: "Leakage Risk", color: [200, 50, 50], visible: true },
   { id: "net-seq", name: "Net Sequestration", color: [0, 150, 150], visible: true },
   { id: "marketable", name: "Marketable Credits", color: [150, 0, 200], visible: true },
-  { id: "carbon-pricing", name: "Carbon Pricing", color: [255, 255, 0], visible: true },
+  // { id: "carbon-pricing", name: "Carbon Pricing", color: [255, 255, 0], visible: true },
 ];
 
 interface GeoJSONProviderProps {

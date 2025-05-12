@@ -15,7 +15,6 @@ export type MetricLayerType =
   | "leakage" 
   | "netSequestration" 
   | "marketableCredits"
-  | "carbonPricing"; // Added new carbon pricing type
 
 // Interface for the carbon metrics data
 export interface CarbonMetricsData {
@@ -25,7 +24,6 @@ export interface CarbonMetricsData {
   leakage: number;
   netSequestration: number;
   marketableCredits: number;
-  carbonPricing: number; // Added new field
 }
 
 // Interface for metric layer info
@@ -296,11 +294,10 @@ export const DrawingProvider: React.FC<DrawingProviderProps> = ({ children }) =>
     }
     
     // Calculate the metrics based on the formula provided
-    const forestGrowth = totalCarbon2024 - totalCarbon2017;
+    const forestGrowth = (totalCarbon2024 - totalCarbon2017)/7;
     const leakage = forestGrowth * 0.1; // 10% of forest growth
-    const netSequestration = forestGrowth * 0.05; // 5% of forest growth
-    const marketableCredits = forestGrowth - leakage - netSequestration;
-    const carbonPricing = marketableCredits * 96000; // Example pricing per ton of CO2
+    const netSequestration = forestGrowth - leakage; // 5% of forest growth
+    const marketableCredits = netSequestration > 0 ? netSequestration * 96000 : 0;
     
     // Return the metrics
     return {
@@ -310,7 +307,6 @@ export const DrawingProvider: React.FC<DrawingProviderProps> = ({ children }) =>
       leakage: Math.round(leakage),
       netSequestration: Math.round(netSequestration),
       marketableCredits: Math.round(marketableCredits),
-      carbonPricing: Math.round(carbonPricing) // Added new field
     };
   } catch (error) {
     console.error('Error calculating carbon metrics:', error);
@@ -341,10 +337,9 @@ const fallbackCarbonMetrics = (polygon: Polygon): CarbonMetricsData => {
   const area = calculateArea(polygon);
   const carbonStocks = Math.round(area * 0.075);
   const forestGrowth = Math.round(area * 0.15);
-  const leakage = Math.round(area * 0.03);
+  const leakage = Math.round(area * 0.1);
   const netSequestration = forestGrowth - leakage;
-  const marketableCredits = Math.round(netSequestration * 0.9);
-  const carbonPricing = Math.round(marketableCredits * 96000); // Example pricing per ton of CO2
+  const marketableCredits = Math.round(netSequestration * 96000);
   
   return {
     area: Math.round(area),
@@ -353,7 +348,6 @@ const fallbackCarbonMetrics = (polygon: Polygon): CarbonMetricsData => {
     leakage,
     netSequestration,
     marketableCredits,
-    carbonPricing
 
   };
 }

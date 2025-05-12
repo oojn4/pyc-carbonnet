@@ -24,9 +24,7 @@ const MeasurementStep: React.FC<MeasurementStepProps> = ({ onCreateReport }) => 
   const { carbonMetrics } = useDrawing();
 
   // Calculate carbon pricing if not available in metrics
-  const carbonPricing = carbonMetrics?.carbonPricing || 
-    (carbonMetrics?.marketableCredits ? carbonMetrics.marketableCredits * 96000 : 0);
-
+  const carbonPricing = carbonMetrics?.marketableCredits || 0;
   return (
     <Timeline positions="left" className="space-y-4">
       <TimelineItem status="done">
@@ -70,21 +68,21 @@ const MeasurementStep: React.FC<MeasurementStepProps> = ({ onCreateReport }) => 
             <div>{carbonMetrics?.netSequestration || 0} tCO<sub>2</sub>e</div>
           </div>
           
-          <div className="space-y-2 rounded-md border p-2 bg-blue-50">
+          {/* <div className="space-y-2 rounded-md border p-2 bg-blue-50">
             <div className="font-bold text-sm flex items-center gap-2">
               <div className="flex items-center justify-center bg-blue-500 text-white rounded-full w-6 h-6 text-xs">5</div>
               Marketable Carbon Credits
             </div>
-            <div>{carbonMetrics?.marketableCredits || 0} tCO<sub>2</sub>e</div>
-          </div>
+            <div>Rp. {carbonMetrics?.marketableCredits || 0}</div>
+          </div> */}
           
           {/* New Carbon Pricing section */}
           <div className="space-y-2 rounded-md border p-2 bg-blue-100">
             <div className="font-bold text-sm flex items-center gap-2">
               <div className="flex items-center justify-center bg-blue-600 text-white rounded-full w-6 h-6 text-xs">
-                6
+                5
               </div>
-              Carbon Pricing
+              Marketable Carbon Credits
             </div>
             <div className="font-medium text-blue-700">
               Rp. {carbonPricing.toLocaleString()}

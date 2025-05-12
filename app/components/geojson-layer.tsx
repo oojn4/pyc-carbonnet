@@ -101,22 +101,22 @@ const LAYER_CONFIGS = [
       return [Math.round(100 + intensity * 155), 0, Math.round(150 + intensity * 105)];
     },
   },
-  {
-    id: "carbon-pricing",
-    name: "Carbon Pricing (USD)",
-    accessor: (f: any) => {
-      const growth = (f.properties?.total_carbon_2024_sum || 0) - (f.properties?.total_carbon_2017_sum || 0);
-      const leakage = growth * 0.1;
-      const netSeq = growth * 0.05;
-      const marketableCredits = growth - leakage - netSeq;
-      return marketableCredits * 96000; // Calculate carbon pricing
-    },
-    getColor: (val: number) => {
-      const maxPrice = 100000000; // 100 million
-      const intensity = Math.min(1, val / maxPrice);
-      return [50, 150, Math.round(200 + intensity * 55)]; // Blue color gradient
-    },
-  }
+  // {
+  //   id: "carbon-pricing",
+  //   name: "Carbon Pricing (USD)",
+  //   accessor: (f: any) => {
+  //     const growth = (f.properties?.total_carbon_2024_sum || 0) - (f.properties?.total_carbon_2017_sum || 0);
+  //     const leakage = growth * 0.1;
+  //     const netSeq = growth * 0.05;
+  //     const marketableCredits = growth - leakage - netSeq;
+  //     return marketableCredits * 96000; // Calculate carbon pricing
+  //   },
+  //   getColor: (val: number) => {
+  //     const maxPrice = 100000000; // 100 million
+  //     const intensity = Math.min(1, val / maxPrice);
+  //     return [50, 150, Math.round(200 + intensity * 55)]; // Blue color gradient
+  //   },
+  // }
 ];
 
 // Create a placeholder empty FeatureCollection for layers without data

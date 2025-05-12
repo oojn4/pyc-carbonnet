@@ -202,7 +202,7 @@ const DeckGLLayers: React.FC = () => {
             getFillColor: (feature) => {
               const carbon2017 = feature.properties?.total_carbon_2017_sum || 0;
               const carbon2024 = feature.properties?.total_carbon_2024_sum || 0;
-              const growth = carbon2024 - carbon2017;
+              const growth = (carbon2024 - carbon2017)/7;
               
               // Blue (negative) to Green (positive)
               if (growth > 0) {
@@ -232,7 +232,7 @@ const DeckGLLayers: React.FC = () => {
             getFillColor: (feature) => {
               const carbon2017 = feature.properties?.total_carbon_2017_sum || 0;
               const carbon2024 = feature.properties?.total_carbon_2024_sum || 0;
-              const growth = carbon2024 - carbon2017;
+              const growth = (carbon2024 - carbon2017)/7;
               const leakage = growth * 0.1; // 10% of growth
               
               // Red scale based on risk
@@ -258,8 +258,9 @@ const DeckGLLayers: React.FC = () => {
             getFillColor: (feature) => {
               const carbon2017 = feature.properties?.total_carbon_2017_sum || 0;
               const carbon2024 = feature.properties?.total_carbon_2024_sum || 0;
-              const growth = carbon2024 - carbon2017;
-              const netSeq = growth * 0.05; // 5% of growth
+              const growth = (carbon2024 - carbon2017)/7;
+              const leakage = growth * 0.1; // 10% of growth
+              const netSeq = growth-leakage; // 5% of growth
               
               // Teal scale
               const intensity = Math.min(1, Math.abs(netSeq) / 5000);
@@ -284,10 +285,10 @@ const DeckGLLayers: React.FC = () => {
             getFillColor: (feature) => {
               const carbon2017 = feature.properties?.total_carbon_2017_sum || 0;
               const carbon2024 = feature.properties?.total_carbon_2024_sum || 0;
-              const growth = carbon2024 - carbon2017;
+              const growth = (carbon2024 - carbon2017)/7;
               const leakage = growth * 0.1; // 10% of growth
-              const netSeq = growth * 0.05; // 5% of growth
-              const marketable = growth - leakage - netSeq;
+              const netSeq = growth-leakage; // 5% of growth
+              const marketable = netSeq>0 ? netSeq*9600:0;
               
               // Purple scale
               const intensity = Math.min(1, Math.abs(marketable) / 100000);
@@ -300,35 +301,34 @@ const DeckGLLayers: React.FC = () => {
         );
       }
       
-      // Add Carbon Pricing layer
-      if (visibleLayers.some(l => l.id === "carbon-pricing")) {
-        layers.push(
-          new GeoJsonLayer({
-            id: 'geojson-carbon-pricing',
-            data: geodata,
-            pickable: true,
-            stroked: true,
-            filled: true,
-            getFillColor: (feature) => {
-              const carbon2017 = feature.properties?.total_carbon_2017_sum || 0;
-              const carbon2024 = feature.properties?.total_carbon_2024_sum || 0;
-              const growth = carbon2024 - carbon2017;
-              const leakage = growth * 0.1; // 10% of growth
-              const netSeq = growth * 0.05; // 5% of growth
-              const marketable = growth - leakage - netSeq;
-              const carbonPricing = marketable * 96000; // Calculate carbon pricing
+      // // Add Carbon Pricing layer
+      // if (visibleLayers.some(l => l.id === "carbon-pricing")) {
+      //   layers.push(
+      //     new GeoJsonLayer({
+      //       id: 'geojson-carbon-pricing',
+      //       data: geodata,
+      //       pickable: true,
+      //       stroked: true,
+      //       filled: true,
+      //       getFillColor: (feature) => {
+      //         const carbon2017 = feature.properties?.total_carbon_2017_sum || 0;
+      //         const carbon2024 = feature.properties?.total_carbon_2024_sum || 0;
+      //         const growth = (carbon2024 - carbon2017)/7;
+      //         const leakage = growth * 0.1; // 10% of growth
+      //         const netSeq = growth-leakage; // 5% of growth
+      //         const marketable = netSeq>0 ? netSeq*9600:0;
               
-              // Blue scale
-              const maxPrice = 100000000; // 100 million
-              const intensity = Math.min(1, carbonPricing / maxPrice);
-              return [50, 150, Math.round(200 + intensity * 55), 150]; // Blue color gradient
-            },
-            getLineColor: [80, 80, 80, 255],
-            lineWidthMinPixels: 1,
-            opacity: 0.7
-          })
-        );
-      }
+      //         // Blue scale
+      //         const maxPrice = 100000000; // 100 million
+      //         const intensity = Math.min(1, marketable / maxPrice);
+      //         return [50, 150, Math.round(200 + intensity * 55), 150]; // Blue color gradient
+      //       },
+      //       getLineColor: [80, 80, 80, 255],
+      //       lineWidthMinPixels: 1,
+      //       opacity: 0.7
+      //     })
+      //   );
+      // }
       
       return layers;
     } catch (error) {

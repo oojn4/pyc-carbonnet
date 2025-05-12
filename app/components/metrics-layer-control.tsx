@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
-import { ChevronDown, ChevronUp, DollarSign, LayersIcon } from "lucide-react";
+import { ChevronDown, ChevronUp, LayersIcon } from "lucide-react";
 import React, { useState } from "react";
 
 const MetricLayersControl: React.FC = () => {
@@ -83,9 +83,6 @@ const MetricLayersControl: React.FC = () => {
                   }}
                 />
                 {layer.name}
-                {layer.id === "carbonPricing" && (
-                  <DollarSign className="ml-1 size-3 text-blue-500" />
-                )}
               </label>
             </div>
           ))}
