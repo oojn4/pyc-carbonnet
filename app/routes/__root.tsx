@@ -2,13 +2,13 @@ import tailwind from "@/tailwind.css?url";
 import geistMono from "@fontsource-variable/geist-mono?url";
 import plusJakartaSans from "@fontsource-variable/plus-jakarta-sans?url";
 
-import { RouterContext } from "@/router";
-import { Toaster } from "@/components/ui/sonner";
 import { DevTools } from "@/components/ui/dev-tools";
+import { Toaster } from "@/components/ui/sonner";
+import { RouterContext } from "@/router";
 import {
+  HeadContent,
   Outlet,
   Scripts,
-  HeadContent,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
 
@@ -23,11 +23,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Carbon Sensing AI",
+        title: "CarbonNet",
       },
       {
         description:
-          "Carbon Sensing AI is a platform that uses AI to analyze carbon data.",
+          "CarbonNet is a platform that uses AI to analyze carbon data.",
       },
     ],
     links: [

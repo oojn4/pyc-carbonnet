@@ -168,7 +168,7 @@ const Content: React.FC = () => {
                 </Tooltip>
               </TooltipProvider>
             )}
-            <h1 className="font-bold text-base">Carbon Sensing AI</h1>
+            <h1 className="font-bold text-base">CarbonNet</h1>
           </div>
         </CardHeader>
         <Separator />
@@ -261,7 +261,7 @@ const WidgetMobile: React.FC = () => {
       <Drawer>
         <DrawerTrigger asChild>
           <Button variant="outline" className="w-full gap-x-2">
-            <span>Carbon Sensing</span>
+            <span>CarbonNet</span>
             <LeafIcon className="size-4" />
           </Button>
         </DrawerTrigger>
