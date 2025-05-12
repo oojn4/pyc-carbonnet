@@ -23,12 +23,13 @@ interface MeasurementStepProps {
 const MeasurementStep: React.FC<MeasurementStepProps> = ({ onCreateReport }) => {
   const { carbonMetrics } = useDrawing();
 
+  // Calculate carbon pricing if not available in metrics
+  const carbonPricing = carbonMetrics?.carbonPricing || 
+    (carbonMetrics?.marketableCredits ? carbonMetrics.marketableCredits * 96000 : 0);
+
   return (
     <Timeline positions="left" className="space-y-4">
       <TimelineItem status="done">
-        {/* <TimelineHeading className="line-clamp-1 flex w-full flex-row items-center justify-between text-ellipsis font-semibold text-sm">
-          Measurement
-        </TimelineHeading> */}
         <TimelineDot status="current" />
         <TimelineLine done className="min-h-4" />
         <TimelineContent side="right" className="w-full space-y-2 py-2">
@@ -75,6 +76,22 @@ const MeasurementStep: React.FC<MeasurementStepProps> = ({ onCreateReport }) => 
               Marketable Carbon Credits
             </div>
             <div>{carbonMetrics?.marketableCredits || 0} tCO<sub>2</sub>e</div>
+          </div>
+          
+          {/* New Carbon Pricing section */}
+          <div className="space-y-2 rounded-md border p-2 bg-blue-100">
+            <div className="font-bold text-sm flex items-center gap-2">
+              <div className="flex items-center justify-center bg-blue-600 text-white rounded-full w-6 h-6 text-xs">
+                6
+              </div>
+              Carbon Pricing
+            </div>
+            <div className="font-medium text-blue-700">
+              Rp. {carbonPricing.toLocaleString()}
+            </div>
+            <div className="text-xs text-blue-600">
+              Based on market rate of Rp 96,000 per marketable credit
+            </div>
           </div>
           
           <div className="space-y-2 mt-4">

@@ -3,12 +3,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useDrawing } from "@/components/ui/drawing-context";
 import { Separator } from "@/components/ui/separator";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
 } from "@/components/ui/tooltip";
-import { ChevronDown, ChevronUp, LayersIcon } from "lucide-react";
+import { ChevronDown, ChevronUp, DollarSign, LayersIcon } from "lucide-react";
 import React, { useState } from "react";
 
 const MetricLayersControl: React.FC = () => {
@@ -83,6 +83,9 @@ const MetricLayersControl: React.FC = () => {
                   }}
                 />
                 {layer.name}
+                {layer.id === "carbonPricing" && (
+                  <DollarSign className="ml-1 size-3 text-blue-500" />
+                )}
               </label>
             </div>
           ))}

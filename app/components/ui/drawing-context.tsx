@@ -7,32 +7,36 @@ import React, { createContext, ReactNode, useContext, useState } from "react";
 type Point = [number, number];
 type Polygon = Point[];
 
-// Interface for carbon metrics data
-interface CarbonMetricsData {
-  area: number;
-  carbonStocks: number;
-  forestGrowth: number;
-  leakage: number;
-  netSequestration: number;
-  marketableCredits: number;
-}
-
-// Available metric layer types
+// MetricLayerType enum
 export type MetricLayerType = 
   | "areaCoverage" 
   | "carbonStock" 
   | "forestGrowth" 
   | "leakage" 
   | "netSequestration" 
-  | "marketableCredits";
+  | "marketableCredits"
+  | "carbonPricing"; // Added new carbon pricing type
 
+// Interface for the carbon metrics data
+export interface CarbonMetricsData {
+  area: number;
+  carbonStocks: number;
+  forestGrowth: number;
+  leakage: number;
+  netSequestration: number;
+  marketableCredits: number;
+  carbonPricing: number; // Added new field
+}
+
+// Interface for metric layer info
 export interface MetricLayerInfo {
   id: MetricLayerType;
   name: string;
-  color: number[];
+  color: number[]; // RGBA values
   visible: boolean;
 }
 
+// Drawing context interface (partial)
 interface DrawingContextType {
   drawingMode: boolean;
   startDrawingMode: () => void;
@@ -49,7 +53,6 @@ interface DrawingContextType {
   toggleMetricLayer: (layerId: MetricLayerType) => void;
   setAllMetricLayers: (visible: boolean) => void;
 }
-
 // Create context for drawing functionality
 export const DrawingContext = createContext<DrawingContextType | null>(null);
 
@@ -297,6 +300,7 @@ export const DrawingProvider: React.FC<DrawingProviderProps> = ({ children }) =>
     const leakage = forestGrowth * 0.1; // 10% of forest growth
     const netSequestration = forestGrowth * 0.05; // 5% of forest growth
     const marketableCredits = forestGrowth - leakage - netSequestration;
+    const carbonPricing = marketableCredits * 96000; // Example pricing per ton of CO2
     
     // Return the metrics
     return {
@@ -305,7 +309,8 @@ export const DrawingProvider: React.FC<DrawingProviderProps> = ({ children }) =>
       forestGrowth: Math.round(forestGrowth),
       leakage: Math.round(leakage),
       netSequestration: Math.round(netSequestration),
-      marketableCredits: Math.round(marketableCredits)
+      marketableCredits: Math.round(marketableCredits),
+      carbonPricing: Math.round(carbonPricing) // Added new field
     };
   } catch (error) {
     console.error('Error calculating carbon metrics:', error);
@@ -339,6 +344,7 @@ const fallbackCarbonMetrics = (polygon: Polygon): CarbonMetricsData => {
   const leakage = Math.round(area * 0.03);
   const netSequestration = forestGrowth - leakage;
   const marketableCredits = Math.round(netSequestration * 0.9);
+  const carbonPricing = Math.round(marketableCredits * 96000); // Example pricing per ton of CO2
   
   return {
     area: Math.round(area),
@@ -346,7 +352,9 @@ const fallbackCarbonMetrics = (polygon: Polygon): CarbonMetricsData => {
     forestGrowth,
     leakage,
     netSequestration,
-    marketableCredits
+    marketableCredits,
+    carbonPricing
+
   };
 }
   // Clear all drawings
