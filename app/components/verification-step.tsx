@@ -94,7 +94,7 @@ const VerificationStep: React.FC<VerificationStepProps> = () => {
         id: 1,
         severity: 'high',
         type: 'Unusual Carbon Growth',
-        description: `Detected ${forestGrowthPercentage.toFixed(1)}% growth in carbon stocks between 2017-2024, which exceeds expected natural sequestration rates. This may indicate measurement error or unreported activities.`,
+        description: `Detected ${forestGrowthPercentage.toFixed(1)}% growth in carbon stocks between 2015-2020, which exceeds expected natural sequestration rates. This may indicate measurement error or unreported activities.`,
         location: [centerLon, centerLat]
       });
     }
@@ -126,7 +126,7 @@ const VerificationStep: React.FC<VerificationStepProps> = () => {
         id: 3,
         severity: 'medium',
         type: 'LULC Classification Error',
-        description: 'Land use classification appears inconsistent with satellite imagery. Area classified as forest in 2024 appears as non-forest in high-resolution imagery.',
+        description: 'Land use classification appears inconsistent with satellite imagery. Area classified as forest in 2020 appears as non-forest in high-resolution imagery.',
         location: lulcPoint
       });
       

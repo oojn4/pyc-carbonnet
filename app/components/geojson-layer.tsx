@@ -31,7 +31,7 @@ const LAYER_CONFIGS = [
   // },
   {
     id: "carbon-2017",
-    name: "Total Carbon Stocks 2017",
+    name: "Total Carbon Stocks 2015",
     accessor: (f: any) => f.properties?.total_carbon_2017_sum || 0,
     getColor: (val: number) => {
       const maxCarbon = 2000000;
@@ -41,7 +41,7 @@ const LAYER_CONFIGS = [
   },
   {
     id: "carbon-2024",
-    name: "Total Carbon Stocks 2024",
+    name: "Total Carbon Stocks 2020",
     accessor: (f: any) => f.properties?.total_carbon_2024_sum || 0,
     getColor: (val: number) => {
       const maxCarbon = 2000000;

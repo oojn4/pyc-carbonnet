@@ -15,8 +15,6 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import {
   BarChart2,
   CheckCircle,
@@ -96,55 +94,28 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
     setShowPdfPreview(false);
   };
 
-  // Function to download PDF
+  // Simplified function to download the pre-prepared PDF from public folder
   const handleDownloadPDF = async () => {
-    if (!pdfContentRef.current) return;
-    
     try {
       setDownloading(true);
       
-      const content = pdfContentRef.current;
-      const canvas = await html2canvas(content, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff"
-      });
+      // Create a link element
+      const link = document.createElement('a');
       
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
+      // Set the href to the pre-prepared PDF file in the public folder
+      link.href = '/report.pdf';
       
-      // Calculate dimensions
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Set download attribute with filename
+      link.download = `Carbon_Project_Report_${new Date().toISOString().slice(0,10)}.pdf`;
       
-      let position = 0;
-      
-      // Add image to PDF
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      
-      // If content is taller than one page
-      let heightLeft = imgHeight;
-      const pageHeight = 295; // A4 height in mm
-      
-      while (heightLeft > pageHeight) {
-        position = heightLeft - pageHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-      
-      // Save the PDF
-      const fileName = `${projectData.name || 'Carbon_Project'}_Report_${new Date().toISOString().slice(0,10)}.pdf`;
-      pdf.save(fileName);
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('There was an error generating the PDF. Please try again.');
+      console.error('Error downloading PDF:', error);
+      alert('There was an error downloading the PDF. Please try again.');
     } finally {
       setDownloading(false);
     }
@@ -156,7 +127,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-md shadow-lg w-full max-w-4xl h-5/6 flex flex-col">
           <div className="flex justify-between items-center p-4 border-b">
-            <h3 className="font-bold">Carbon Project Comparative Analysis: 2017-2024</h3>
+            <h3 className="font-bold">Carbon Project Comparative Analysis: 2015-2020</h3>
             <Button variant="ghost" size="sm" onClick={handleClosePdfPreview}>
               <X className="size-4" />
             </Button>
@@ -171,7 +142,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
               <div className="border-t pt-4">
                 <h2 className="text-xl font-semibold mb-4">Executive Summary</h2>
                 <p>
-                  This report provides a comprehensive analysis of carbon stock changes between 2017 and 2024 
+                  This report provides a comprehensive analysis of carbon stock changes between 2015 and 2020 
                   for the selected area. The analysis is based on remote sensing data and field measurements, 
                   providing insights into carbon sequestration, leakage risks, and overall carbon credit potential.
                 </p>
@@ -202,8 +173,8 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                     <thead>
                       <tr className="bg-gray-100">
                         <th className="border p-2 text-left">Metric</th>
-                        <th className="border p-2 text-right">2017 Value</th>
-                        <th className="border p-2 text-right">2024 Value</th>
+                        <th className="border p-2 text-right">2015 Value</th>
+                        <th className="border p-2 text-right">2020 Value</th>
                         <th className="border p-2 text-right">Change</th>
                         <th className="border p-2 text-right">% Change</th>
                       </tr>
@@ -262,7 +233,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <h2 className="text-xl font-semibold mb-4">Land Use Change Analysis</h2>
                 <div className="space-y-2">
                   <p>
-                    Between 2017 and 2024, the project area underwent significant changes in land use and land cover patterns.
+                    Between 2015 and 2020, the project area underwent significant changes in land use and land cover patterns.
                     The analysis reveals a net increase in forest cover, primarily due to reforestation efforts and natural regeneration.
                   </p>
                   <div className="overflow-x-auto">
@@ -270,8 +241,8 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                       <thead>
                         <tr className="bg-gray-100">
                           <th className="border p-2 text-left">Land Use Class</th>
-                          <th className="border p-2 text-right">2017 (ha)</th>
-                          <th className="border p-2 text-right">2024 (ha)</th>
+                          <th className="border p-2 text-right">2015 (ha)</th>
+                          <th className="border p-2 text-right">2020 (ha)</th>
                           <th className="border p-2 text-right">Change (ha)</th>
                         </tr>
                       </thead>
@@ -363,7 +334,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <h2 className="text-xl font-semibold mb-4">Conclusion</h2>
                 <p>
                   The project demonstrates significant carbon sequestration potential with a net positive change in 
-                  carbon stocks between 2017 and 2024. The estimated {carbonMetrics?.netSequestration || 0} tCO₂e 
+                  carbon stocks between 2015 and 2020. The estimated {carbonMetrics?.netSequestration || 0} tCO₂e 
                   of marketable carbon credits represent a valuable contribution to climate change mitigation efforts.
                 </p>
                 <p className="mt-2">
