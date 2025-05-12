@@ -22,7 +22,7 @@ import {
   FileCheck,
   X
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 interface ProjectData {
   name: string;
@@ -53,6 +53,13 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
     verificationReport: false,
     rsVerification: false
   });
+
+  // Ref for the PDF content
+  const pdfContentRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  // Calculate carbon pricing
+  const carbonPricing = carbonMetrics?.marketableCredits ? carbonMetrics.marketableCredits : 0;
 
   const handleProjectDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -87,19 +94,46 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
     setShowPdfPreview(false);
   };
 
+  // Simplified function to download the pre-prepared PDF from public folder
+  const handleDownloadPDF = async () => {
+    try {
+      setDownloading(true);
+      
+      // Create a link element
+      const link = document.createElement('a');
+      
+      // Set the href to the pre-prepared PDF file in the public folder
+      link.href = '/report.pdf';
+      
+      // Set download attribute with filename
+      link.download = `Carbon_Project_Report_${new Date().toISOString().slice(0,10)}.pdf`;
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('There was an error downloading the PDF. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   // PDF Report Preview Component
   const PdfPreview = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-md shadow-lg w-full max-w-4xl h-5/6 flex flex-col">
           <div className="flex justify-between items-center p-4 border-b">
-            <h3 className="font-bold">Carbon Project Comparative Analysis: 2017-2024</h3>
+            <h3 className="font-bold">Carbon Project Comparative Analysis: 2015-2020</h3>
             <Button variant="ghost" size="sm" onClick={handleClosePdfPreview}>
               <X className="size-4" />
             </Button>
           </div>
           <div className="flex-1 overflow-auto p-6">
-            <div className="max-w-3xl mx-auto space-y-6">
+            <div ref={pdfContentRef} className="max-w-3xl mx-auto space-y-6">
               <div className="text-center">
                 <h1 className="text-2xl font-bold mb-2">Carbon Stock Comparative Analysis</h1>
                 <p className="text-sm text-gray-600">Report generated: {new Date().toLocaleDateString()}</p>
@@ -108,7 +142,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
               <div className="border-t pt-4">
                 <h2 className="text-xl font-semibold mb-4">Executive Summary</h2>
                 <p>
-                  This report provides a comprehensive analysis of carbon stock changes between 2017 and 2024 
+                  This report provides a comprehensive analysis of carbon stock changes between 2015 and 2020 
                   for the selected area. The analysis is based on remote sensing data and field measurements, 
                   providing insights into carbon sequestration, leakage risks, and overall carbon credit potential.
                 </p>
@@ -139,8 +173,8 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                     <thead>
                       <tr className="bg-gray-100">
                         <th className="border p-2 text-left">Metric</th>
-                        <th className="border p-2 text-right">2017 Value</th>
-                        <th className="border p-2 text-right">2024 Value</th>
+                        <th className="border p-2 text-right">2015 Value</th>
+                        <th className="border p-2 text-right">2020 Value</th>
                         <th className="border p-2 text-right">Change</th>
                         <th className="border p-2 text-right">% Change</th>
                       </tr>
@@ -199,7 +233,7 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <h2 className="text-xl font-semibold mb-4">Land Use Change Analysis</h2>
                 <div className="space-y-2">
                   <p>
-                    Between 2017 and 2024, the project area underwent significant changes in land use and land cover patterns.
+                    Between 2015 and 2020, the project area underwent significant changes in land use and land cover patterns.
                     The analysis reveals a net increase in forest cover, primarily due to reforestation efforts and natural regeneration.
                   </p>
                   <div className="overflow-x-auto">
@@ -207,8 +241,8 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                       <thead>
                         <tr className="bg-gray-100">
                           <th className="border p-2 text-left">Land Use Class</th>
-                          <th className="border p-2 text-right">2017 (ha)</th>
-                          <th className="border p-2 text-right">2024 (ha)</th>
+                          <th className="border p-2 text-right">2015 (ha)</th>
+                          <th className="border p-2 text-right">2020 (ha)</th>
                           <th className="border p-2 text-right">Change (ha)</th>
                         </tr>
                       </thead>
@@ -257,34 +291,41 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="font-bold text-green-800">Total Marketable Carbon Credits</h3>
+                      <h3 className="font-bold text-green-800">Total Net Sequestration</h3>
                       <p className="text-sm text-green-700">After accounting for leakage and permanence risks</p>
                     </div>
                     <div className="text-2xl font-bold text-green-700">
-                      {carbonMetrics?.marketableCredits || 0} tCO₂e
+                      {carbonMetrics?.netSequestration || 0} tCO₂e
                     </div>
                   </div>
                 </div>
               </div>
               
               <div className="border-t pt-4">
-                <h2 className="text-xl font-semibold mb-4">Risk Assessment</h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium">Leakage Risk</h3>
-                    <p>
-                      The estimated leakage risk for this project is {carbonMetrics?.leakage || 0} tCO₂e, 
-                      representing 10% of the total forest growth. The primary leakage risks include displacement 
-                      of agricultural activities and timber harvesting to adjacent areas.
-                    </p>
+                <h2 className="text-xl font-semibold mb-4">Carbon Valuation</h2>
+                <p>
+                  Based on the current carbon price of Rp 96,000 per tCO₂e, the estimated financial value 
+                  of the carbon credits generated by this project is:
+                </p>
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-bold text-blue-800">Total Carbon Credit Value</h3>
+                      <p className="text-sm text-blue-700">Current market rate: Rp 96,000 per tCO₂e</p>
+                    </div>
+                    <div className="text-2xl font-bold text-blue-700 flex items-center">
+                      Rp {carbonPricing.toLocaleString()}
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium">Non-Permanence Risk</h3>
-                    <p>
-                      The non-permanence risk buffer is calculated at {carbonMetrics?.netSequestration || 0} tCO₂e,
-                      which represents 5% of the total forest growth. This accounts for risks related to fire, 
-                      illegal logging, and climate change impacts.
-                    </p>
+                  <div className="mt-3 pt-3 border-t border-blue-200">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-blue-700">Net Sequestration</span>
+                      <span className="text-blue-700">{carbonMetrics?.netSequestration || 0} tCO₂e</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-blue-700">Price per Credit</span>
+                      <span className="text-blue-700">Rp 96,000</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -293,10 +334,12 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 <h2 className="text-xl font-semibold mb-4">Conclusion</h2>
                 <p>
                   The project demonstrates significant carbon sequestration potential with a net positive change in 
-                  carbon stocks between 2017 and 2024. The estimated {carbonMetrics?.marketableCredits || 0} tCO₂e 
+                  carbon stocks between 2015 and 2020. The estimated {carbonMetrics?.netSequestration || 0} tCO₂e 
                   of marketable carbon credits represent a valuable contribution to climate change mitigation efforts.
                 </p>
                 <p className="mt-2">
+                  With a total estimated value of Rp {carbonPricing.toLocaleString()}, this project not only 
+                  provides environmental benefits but also represents a significant financial opportunity.
                   The next step is to proceed with verification of these findings through independent third-party 
                   verification to confirm the accuracy of measurements and calculations.
                 </p>
@@ -304,9 +347,22 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
             </div>
           </div>
           <div className="border-t p-4 flex justify-end">
-            <Button className="flex items-center gap-2">
-              <Download className="size-4" />
-              <span>Download PDF</span>
+            <Button 
+              className="flex items-center gap-2"
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+            >
+              {downloading ? (
+                <>
+                  <span className="animate-spin h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
+                  <span>Generating PDF...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="size-4" />
+                  <span>Download PDF</span>
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -319,9 +375,6 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
       {showPdfPreview && <PdfPreview />}
       <Timeline positions="left" className="space-y-4">
         <TimelineItem status="done">
-          {/* <TimelineHeading className="line-clamp-1 flex w-full flex-row items-center justify-between text-ellipsis font-semibold text-sm">
-            Measurement
-          </TimelineHeading> */}
           <TimelineDot status="done" />
           <TimelineLine done className="min-h-4" />
           <TimelineContent side="right" className="w-full py-2">
@@ -329,9 +382,6 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
           </TimelineContent>
         </TimelineItem>
         <TimelineItem status={"default"}>
-          {/* <TimelineHeading className="line-clamp-1 flex w-full flex-row items-center justify-between text-ellipsis font-semibold text-sm">
-            Reporting
-          </TimelineHeading> */}
           <TimelineDot status="current" />
           <TimelineLine done className="min-h-4" />
           <TimelineContent side="right" className="w-full space-y-2 py-2">
@@ -379,18 +429,6 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                       rows={3}
                     />
                   </div>
-                  
-                  {/* <div className="space-y-2">
-                    <div className="text-xs text-gray-500">Upload Supporting Document (Optional)</div>
-                    <Button 
-                      variant="outline" 
-                      className="w-full flex items-center gap-2 text-sm"
-                      onClick={handleUploadDocument}
-                    >
-                      <Upload className="size-4" />
-                      <span>Upload Document</span>
-                    </Button>
-                  </div> */}
                 </div>
                 
                 <div className="flex items-center justify-center p-4">
@@ -430,55 +468,11 @@ const ReportStep: React.FC<ReportStepProps> = ({ onProceedToVerification }) => {
                 
                 <div className="space-y-2 rounded-md border p-2 bg-orange-50">
                   <div className="font-bold text-sm flex items-center gap-2">
-                    <div className="flex items-center justify-center bg-orange-500 text-white rounded-full w-6 h-6 text-xs">1</div>
-                    Mitigation Action Plan Document
+                    <div className="flex items-center justify-center bg-orange-500 text-white rounded-full w-6 h-6 text-xs"></div>
+                    Automated Reporting System
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Generated based on your project data</span>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-8" onClick={handleViewDocument}>
-                            <FileCheck className="size-4 mr-1" /> View
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>View document details</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 rounded-md border p-2 bg-orange-50">
-                  <div className="font-bold text-sm flex items-center gap-2">
-                    <div className="flex items-center justify-center bg-orange-500 text-white rounded-full w-6 h-6 text-xs">2</div>
-                    Validation Report
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Initial validation of project eligibility</span>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-8" onClick={handleViewDocument}>
-                            <FileCheck className="size-4 mr-1" /> View
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>View document details</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 rounded-md border p-2 bg-orange-50">
-                  <div className="font-bold text-sm flex items-center gap-2">
-                    <div className="flex items-center justify-center bg-orange-500 text-white rounded-full w-6 h-6 text-xs">3</div>
-                    Mitigation Action Achievement Report
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Projected carbon capture assessment</span>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>

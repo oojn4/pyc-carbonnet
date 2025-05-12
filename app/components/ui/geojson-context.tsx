@@ -23,14 +23,15 @@ export const GeoJSONContext = createContext<GeoJSONContextType | null>(null);
 
 // Define the 8 initial layers
 const initialLayers: GeoJSONLayerInfo[] = [
-  { id: "lulc-2017", name: "LULC 2017", color: [0, 180, 0], visible: true },
-  { id: "lulc-2024", name: "LULC 2024", color: [0, 150, 0], visible: true },
-  { id: "carbon-2017", name: "Total Carbon Stocks 2017", color: [100, 200, 100], visible: true },
-  { id: "carbon-2024", name: "Total Carbon Stocks 2024", color: [50, 150, 50], visible: true },
+  // { id: "lulc-2017", name: "LULC 2017", color: [0, 180, 0], visible: true },
+  // { id: "lulc-2024", name: "LULC 2024", color: [0, 150, 0], visible: true },
+  { id: "carbon-2017", name: "Total Carbon Stocks 2015", color: [100, 200, 100], visible: true },
+  { id: "carbon-2024", name: "Total Carbon Stocks 2020", color: [50, 150, 50], visible: true },
   { id: "growth", name: "Forest Growth & Sequestration", color: [0, 200, 50], visible: true },
   { id: "leakage", name: "Leakage Risk", color: [200, 50, 50], visible: true },
   { id: "net-seq", name: "Net Sequestration", color: [0, 150, 150], visible: true },
   { id: "marketable", name: "Marketable Credits", color: [150, 0, 200], visible: true },
+  // { id: "carbon-pricing", name: "Carbon Pricing", color: [255, 255, 0], visible: true },
 ];
 
 interface GeoJSONProviderProps {

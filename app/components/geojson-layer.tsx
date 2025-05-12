@@ -17,21 +17,21 @@ const LULC_COLORS = {
 
 // Define layer configurations
 const LAYER_CONFIGS = [
-  {
-    id: "lulc-2017",
-    name: "LULC 2017",
-    accessor: (f: any) => f.properties?.lulc_2017_majority || 0,
-    getColor: (val: number) => LULC_COLORS[val as keyof typeof LULC_COLORS] || [100, 100, 100],
-  },
-  {
-    id: "lulc-2024",
-    name: "LULC 2024",
-    accessor: (f: any) => f.properties?.lulc_2024_majority || 0,
-    getColor: (val: number) => LULC_COLORS[val as keyof typeof LULC_COLORS] || [100, 100, 100],
-  },
+  // {
+  //   id: "lulc-2017",
+  //   name: "LULC 2017",
+  //   accessor: (f: any) => f.properties?.lulc_2017_majority || 0,
+  //   getColor: (val: number) => LULC_COLORS[val as keyof typeof LULC_COLORS] || [100, 100, 100],
+  // },
+  // {
+  //   id: "lulc-2024",
+  //   name: "LULC 2024",
+  //   accessor: (f: any) => f.properties?.lulc_2024_majority || 0,
+  //   getColor: (val: number) => LULC_COLORS[val as keyof typeof LULC_COLORS] || [100, 100, 100],
+  // },
   {
     id: "carbon-2017",
-    name: "Total Carbon Stocks 2017",
+    name: "Total Carbon Stocks 2015",
     accessor: (f: any) => f.properties?.total_carbon_2017_sum || 0,
     getColor: (val: number) => {
       const maxCarbon = 2000000;
@@ -41,7 +41,7 @@ const LAYER_CONFIGS = [
   },
   {
     id: "carbon-2024",
-    name: "Total Carbon Stocks 2024",
+    name: "Total Carbon Stocks 2020",
     accessor: (f: any) => f.properties?.total_carbon_2024_sum || 0,
     getColor: (val: number) => {
       const maxCarbon = 2000000;
@@ -100,7 +100,23 @@ const LAYER_CONFIGS = [
       const intensity = Math.min(1, val / 100000);
       return [Math.round(100 + intensity * 155), 0, Math.round(150 + intensity * 105)];
     },
-  }
+  },
+  // {
+  //   id: "carbon-pricing",
+  //   name: "Carbon Pricing (USD)",
+  //   accessor: (f: any) => {
+  //     const growth = (f.properties?.total_carbon_2024_sum || 0) - (f.properties?.total_carbon_2017_sum || 0);
+  //     const leakage = growth * 0.1;
+  //     const netSeq = growth * 0.05;
+  //     const marketableCredits = growth - leakage - netSeq;
+  //     return marketableCredits * 96000; // Calculate carbon pricing
+  //   },
+  //   getColor: (val: number) => {
+  //     const maxPrice = 100000000; // 100 million
+  //     const intensity = Math.min(1, val / maxPrice);
+  //     return [50, 150, Math.round(200 + intensity * 55)]; // Blue color gradient
+  //   },
+  // }
 ];
 
 // Create a placeholder empty FeatureCollection for layers without data

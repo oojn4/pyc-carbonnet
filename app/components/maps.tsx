@@ -27,7 +27,7 @@ const Maps: React.FC = () => {
     <MapInstance
       attributionControl={false}
       className="absolute top-0 left-0 size-full"
-      mapStyle="https://maps.datawan.id/styles/light.json"
+      mapStyle="https://api.maptiler.com/maps/hybrid/style.json?key=O7PAbzskDTxUmuyVGvJ0"
       mapView={{ center: [101.4383, 0.5104], zoom: 9 }}
       onLoad={handleMapLoad}
     />

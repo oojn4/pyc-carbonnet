@@ -91,10 +91,10 @@ const calculateMetricsFromGeoJSON = async (polygon: Polygon): Promise<CarbonMetr
     }
     
     // Calculate the metrics based on the formula provided
-    const forestGrowth = totalCarbon2024 - totalCarbon2017;
+    const forestGrowth = (totalCarbon2024 - totalCarbon2017)/7;
     const leakage = forestGrowth * 0.1; // 10% of forest growth
-    const netSequestration = forestGrowth * 0.05; // 5% of forest growth
-    const marketableCredits = forestGrowth - leakage - netSequestration;
+    const netSequestration = forestGrowth - leakage; // 5% of forest growth
+    const marketableCredits = netSequestration > 0 ? netSequestration * 96000:0;
     
     // Return the metrics
     return {
@@ -262,7 +262,7 @@ class CarbonMetricsLayers extends CompositeLayer {
       {
         id: "marketableCredits" as MetricLayerType,
         name: "Marketable Credits",
-        value: `${metricsData.marketableCredits.toLocaleString()} tCO₂e`,
+        value: `Rp. ${metricsData.marketableCredits.toLocaleString()}`,
         color: [120, 80, 200, 140],
         order: 6
       }

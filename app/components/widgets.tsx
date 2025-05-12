@@ -117,14 +117,10 @@ const Content: React.FC = () => {
               toggleLayer={toggleGeojsonLayer} 
               setAllLayers={setAllGeojsonLayers}
             />
-            
-            {/* Metrics Layer Control */}
-            {showMetricsControl && (
-              <MetricLayersControl />
-            )}
+            <MetricLayersControl />
             
             {/* LULC Legend */}
-            <LULCLegend />
+            {/* <LULCLegend /> */}
           </div>
         </div>
       )}
