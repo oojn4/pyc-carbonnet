@@ -119,12 +119,12 @@ const Content: React.FC = () => {
             />
             
             {/* Metrics Layer Control */}
-            {showMetricsControl && (
+            {/* {showMetricsControl && (
               <MetricLayersControl />
-            )}
+            )} */}
             
             {/* LULC Legend */}
-            <LULCLegend />
+            {/* <LULCLegend /> */}
           </div>
         </div>
       )}
