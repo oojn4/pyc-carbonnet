@@ -27,7 +27,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
       {
         description:
-          "CarbonNet is a platform that uses AI to analyze carbon data.",
+          "CarbonNet is a platform that uses AI to analyze carbon data. ",
       },
     ],
     links: [
